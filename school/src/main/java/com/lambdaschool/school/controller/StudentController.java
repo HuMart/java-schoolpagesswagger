@@ -5,6 +5,8 @@ import com.lambdaschool.school.model.Student;
 import com.lambdaschool.school.service.StudentService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +39,9 @@ public class StudentController
                                                          "Multiple sort criteria are supported.")})
 
     @GetMapping(value = "/students", produces = {"application/json"})
-    public ResponseEntity<?> listAllStudents()
+    public ResponseEntity<?> listAllStudents(@PageableDefault(page = 0, size = 5)Pageable pageable)
     {
-        List<Student> myStudents = studentService.findAll();
+        List<Student> myStudents = studentService.findAll(pageable);
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
@@ -48,9 +50,9 @@ public class StudentController
             @ApiResponse(code = 201, message = "Student Found", response = Student.class),
             @ApiResponse(code = 404, message = "Student Not Found", response = ErrorDetail.class)
     })
-    @GetMapping(value = "/Student/{StudentId}",
+    @GetMapping(value = "/student/{StudentId}",
                 produces = {"application/json"})
-    public ResponseEntity<?> getStudentById(
+    public ResponseEntity<?> getStudentById(@ApiParam(value = "Student Id", required = true, example = "1")
             @PathVariable
                     Long StudentId)
     {
@@ -66,10 +68,10 @@ public class StudentController
     })
     @GetMapping(value = "/student/namelike/{name}",
                 produces = {"application/json"})
-    public ResponseEntity<?> getStudentByNameContaining(
-            @PathVariable String name)
+    public ResponseEntity<?> getStudentByNameContaining(@ApiParam(value = "Student name containing", required = true, example = "anything")
+            @PathVariable String name, @PageableDefault(page = 0, size = 5)Pageable pageable)
     {
-        List<Student> myStudents = studentService.findStudentByNameLike(name);
+        List<Student> myStudents = studentService.findStudentByNameLike(name, pageable);
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
@@ -104,6 +106,7 @@ public class StudentController
     public ResponseEntity<?> updateStudent(
             @RequestBody
                     Student updateStudent,
+            @ApiParam(value = "Student Id", required = true, example = "1")
             @PathVariable
                     long Studentid)
     {
@@ -118,6 +121,7 @@ public class StudentController
     })
     @DeleteMapping("/Student/{Studentid}")
     public ResponseEntity<?> deleteStudentById(
+            @ApiParam(value = "Student Id", required = true)
             @PathVariable
                     long Studentid)
     {
