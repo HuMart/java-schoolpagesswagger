@@ -1,7 +1,9 @@
 package com.lambdaschool.school.controller;
 
+import com.lambdaschool.school.model.ErrorDetail;
 import com.lambdaschool.school.model.Student;
 import com.lambdaschool.school.service.StudentService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,17 @@ public class StudentController
 
     // Please note there is no way to add students to course yet!
 
+    @ApiOperation(value = "Return all students", response = Student.class, responseContainer = "List")
+    @ApiImplicitParams({
+                               @ApiImplicitParam(name = "page", dataType = "integr", paramType = "query",
+                                                 value = "Results page you want to retrieve (0..N)"),
+                               @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+                                                 value = "Number of records per page."),
+                               @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+                                                 value = "Sorting criteria in the format: property(,asc|desc). " +
+                                                         "Default sort order is ascending. " +
+                                                         "Multiple sort criteria are supported.")})
+
     @GetMapping(value = "/students", produces = {"application/json"})
     public ResponseEntity<?> listAllStudents()
     {
@@ -30,6 +43,11 @@ public class StudentController
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Retrieves a student associated with the studentid", response = Student.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Student Found", response = Student.class),
+            @ApiResponse(code = 404, message = "Student Not Found", response = ErrorDetail.class)
+    })
     @GetMapping(value = "/Student/{StudentId}",
                 produces = {"application/json"})
     public ResponseEntity<?> getStudentById(
@@ -41,6 +59,11 @@ public class StudentController
     }
 
 
+    @ApiOperation(value = "Return students with a name containing entry", response = Student.class, responseContainer = "List")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Sucessfully found students in given parameters", response = Student.class, responseContainer = "List"),
+            @ApiResponse(code = 500, message = "An Error occurred students not found", response = ErrorDetail.class)
+    })
     @GetMapping(value = "/student/namelike/{name}",
                 produces = {"application/json"})
     public ResponseEntity<?> getStudentByNameContaining(
@@ -50,7 +73,11 @@ public class StudentController
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
-
+    @ApiOperation(value = "New Student Created", notes = "URL for new student will be in location header", response = void.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successfully created student", response = void.class),
+            @ApiResponse(code = 500, message = "Failed to create student", response = ErrorDetail.class)
+    })
     @PostMapping(value = "/Student",
                  consumes = {"application/json"},
                  produces = {"application/json"})
@@ -68,7 +95,11 @@ public class StudentController
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.CREATED);
     }
 
-
+    @ApiOperation(value = "Update a student", response = void.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successfully updated student", response = void.class),
+            @ApiResponse(code = 500, message = "Failed to update student", response = ErrorDetail.class)
+    })
     @PutMapping(value = "/Student/{Studentid}")
     public ResponseEntity<?> updateStudent(
             @RequestBody
@@ -80,7 +111,11 @@ public class StudentController
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
+    @ApiOperation(value = "Delete a student", response = void.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successfully deleted student", response = void.class),
+            @ApiResponse(code = 500, message = "Failed to delete student", response = ErrorDetail.class)
+    })
     @DeleteMapping("/Student/{Studentid}")
     public ResponseEntity<?> deleteStudentById(
             @PathVariable
