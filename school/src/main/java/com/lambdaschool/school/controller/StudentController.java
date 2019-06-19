@@ -52,7 +52,8 @@ public class StudentController
     })
     @GetMapping(value = "/student/{StudentId}",
                 produces = {"application/json"})
-    public ResponseEntity<?> getStudentById(@ApiParam(value = "Student Id", required = true, example = "1")
+    public ResponseEntity<?> getStudentById(
+            @ApiParam(value = "Student Id", required = true, example = "1")
             @PathVariable
                     Long StudentId)
     {
@@ -68,8 +69,10 @@ public class StudentController
     })
     @GetMapping(value = "/student/namelike/{name}",
                 produces = {"application/json"})
-    public ResponseEntity<?> getStudentByNameContaining(@ApiParam(value = "Student name containing", required = true, example = "anything")
-            @PathVariable String name, @PageableDefault(page = 0, size = 5)Pageable pageable)
+    public ResponseEntity<?> getStudentByNameContaining(
+            @ApiParam(value = "Student name containing", required = true, example = "anything")
+            @PathVariable String name,
+            @PageableDefault(page = 0, size = 5)Pageable pageable)
     {
         List<Student> myStudents = studentService.findStudentByNameLike(name, pageable);
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
